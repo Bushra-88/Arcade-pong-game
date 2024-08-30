@@ -19,3 +19,6 @@ Arcade Pong Game is a classic arcade-style game where players control a paddle t
 ## Live Demo
 
 You can find the game on [Netlify](https://bushra-pong-game.netlify.app/)
+
+Enjoy 😉!
+![pong](https://media.tenor.com/LqNPvLVdzHoAAAAM/cat-ping.gif)
