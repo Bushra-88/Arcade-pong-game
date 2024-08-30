@@ -1,6 +1,9 @@
 const startText = document.getElementById("startText");
 const paddle1 = document.getElementById("paddle1");
 const paddle2 = document.getElementById("paddle2");
+const ball = document.getElementById("ball");
+const player1ScoreElement = document.getElementById("player1Score");
+const player2ScoreElement = document.getElementById("player2Score");
 
 //Game Variables
 let gameRunning = false;
@@ -9,6 +12,12 @@ let paddle1Speed = 0; // in the start
 let paddle1Y = 150;
 let paddle2Speed = 0;
 let paddle2Y = 150;
+let ballX = 290; //the game width/2 minus the ball width
+let ballSpeedX = 2;
+let ballY = 190;
+let ballSpeedY = 2;
+let player2Score = 0;
+let player1Score = 0;
 //Game Constants
 const paddleAcceleration = 1;
 const paddleDeceleration = 1;
@@ -36,6 +45,7 @@ function gameLoop() {
   if (gameRunning) {
     updatePaddle1();
     updatePaddle2();
+    moveBall();
     setTimeout(gameLoop, 8);
   }
 }
@@ -93,4 +103,64 @@ function updatePaddle2() {
     paddle2Y = gameHeight - paddle2.clientHeight;
   }
   paddle2.style.top = paddle2Y + "px";
+}
+
+function moveBall() {
+  ballX += ballSpeedX;
+  ballY += ballSpeedY;
+  //Make the ball not go out of the height of game area
+  if (ballY >= gameHeight - ball.clientHeight || ballY <= 0) {
+    //0 means the top of the game area
+    ballSpeedY = -ballSpeedY; // make it in the opposite direction
+  }
+  // Paddle 1 collision
+  if (
+    ballX <= paddle1.clientWidth &&
+    ballY >= paddle1Y && //the top pf the paddle
+    ballY <= paddle1Y + paddle1.clientHeight //paddle1 clientHeight is the bottom corner of paddle 1
+  ) {
+    ballSpeedX = -ballSpeedX;
+  }
+
+  // Paddle 2 collision
+  if (
+    ballX >= gameWidth - paddle2.clientWidth - ball.clientWidth &&
+    ballY >= paddle2Y &&
+    ballY <= paddle2Y + paddle2.clientHeight //paddle2 clientHeight is the bottom corner of paddle 2
+  ) {
+    ballSpeedX = -ballSpeedX;
+  }
+
+  // Handel out of game area collision
+  if (ballX <= 0) {
+    player2Score++;
+    updateScoreboard();
+    resetBall();
+    pauseGame();
+  } else if (ballX >= gameWidth - ball.clientWidth) {
+    player1Score++;
+    updateScoreboard();
+    resetBall();
+    pauseGame();
+  }
+  ball.style.left = ballX + "px";
+  ball.style.top = ballY + "px";
+}
+
+//Update the score
+function updateScoreboard() {
+  player1ScoreElement.textContent = player1Score;
+  player2ScoreElement.textContent = player2Score;
+}
+
+function resetBall() {
+  ballX = gameWidth / 2 - ball.clientWidth / 2;
+  ballY = gameHeight / 2 - ball.clientHeight / 2;
+  ballSpeedX = Math.random() > 0.5 ? 2 : -2;
+  ballSpeedY = Math.random() > 0.5 ? 2 : -2;
+}
+
+function pauseGame() {
+  gameRunning = false;
+  document.addEventListener("keydown", startGame);
 }
