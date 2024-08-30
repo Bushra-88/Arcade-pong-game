@@ -1,11 +1,14 @@
 const startText = document.getElementById("startText");
 const paddle1 = document.getElementById("paddle1");
+const paddle2 = document.getElementById("paddle2");
 
 //Game Variables
 let gameRunning = false;
 let keyPressed = {};
 let paddle1Speed = 0; // in the start
 let paddle1Y = 150;
+let paddle2Speed = 0;
+let paddle2Y = 150;
 //Game Constants
 const paddleAcceleration = 1;
 const paddleDeceleration = 1;
@@ -32,6 +35,7 @@ function startGame() {
 function gameLoop() {
   if (gameRunning) {
     updatePaddle1();
+    updatePaddle2();
     setTimeout(gameLoop, 8);
   }
 }
@@ -65,4 +69,28 @@ function updatePaddle1() {
     paddle1Y = gameHeight - paddle1.clientHeight; // Prevent the paddle from moving below the bottom edge
   }
   paddle1.style.top = paddle1Y + "px";
+}
+
+function updatePaddle2() {
+  if (keyPressed["ArrowUp"]) {
+    paddle2Speed = Math.max(paddle2Speed - paddleAcceleration, -maxPaddleSpeed);
+  } else if (keyPressed["ArrowDown"]) {
+    paddle2Speed = Math.min(paddle2Speed + paddleAcceleration, maxPaddleSpeed);
+  } else {
+    if (paddle2Speed > 0) {
+      paddle2Speed = Math.max(paddle2Speed - paddleDeceleration, 0);
+    } else if (paddle2Speed < 0) {
+      paddle2Speed = Math.min(paddle2Speed + paddleDeceleration, 0);
+    }
+  }
+
+  paddle2Y += paddle2Speed;
+  // Keep the paddle inside the game area
+  if (paddle2Y < 0) {
+    paddle2Y = 0;
+  }
+  if (paddle2Y > gameHeight - paddle2.clientHeight) {
+    paddle2Y = gameHeight - paddle2.clientHeight;
+  }
+  paddle2.style.top = paddle2Y + "px";
 }
