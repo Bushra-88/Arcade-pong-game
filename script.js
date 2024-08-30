@@ -4,7 +4,9 @@ const paddle2 = document.getElementById("paddle2");
 const ball = document.getElementById("ball");
 const player1ScoreElement = document.getElementById("player1Score");
 const player2ScoreElement = document.getElementById("player2Score");
-
+const lossSound = document.getElementById("lossSound");
+const wallSound = document.getElementById("wallSound");
+const paddleSound = document.getElementById("paddleSound");
 //Game Variables
 let gameRunning = false;
 let keyPressed = {};
@@ -108,11 +110,13 @@ function updatePaddle2() {
 function moveBall() {
   ballX += ballSpeedX;
   ballY += ballSpeedY;
-  //Make the ball not go out of the height of game area
+  //Wall collision
   if (ballY >= gameHeight - ball.clientHeight || ballY <= 0) {
     //0 means the top of the game area
     ballSpeedY = -ballSpeedY; // make it in the opposite direction
+    playSound(wallSound);
   }
+
   // Paddle 1 collision
   if (
     ballX <= paddle1.clientWidth &&
@@ -120,6 +124,7 @@ function moveBall() {
     ballY <= paddle1Y + paddle1.clientHeight //paddle1 clientHeight is the bottom corner of paddle 1
   ) {
     ballSpeedX = -ballSpeedX;
+    playSound(paddleSound);
   }
 
   // Paddle 2 collision
@@ -129,16 +134,19 @@ function moveBall() {
     ballY <= paddle2Y + paddle2.clientHeight //paddle2 clientHeight is the bottom corner of paddle 2
   ) {
     ballSpeedX = -ballSpeedX;
+    playSound(paddleSound);
   }
 
   // Handel out of game area collision
   if (ballX <= 0) {
     player2Score++;
+    playSound(lossSound);
     updateScoreboard();
     resetBall();
     pauseGame();
   } else if (ballX >= gameWidth - ball.clientWidth) {
     player1Score++;
+    playSound(lossSound);
     updateScoreboard();
     resetBall();
     pauseGame();
@@ -163,4 +171,9 @@ function resetBall() {
 function pauseGame() {
   gameRunning = false;
   document.addEventListener("keydown", startGame);
+}
+
+function playSound(sound) {
+  sound.currentTime = 0;
+  sound.play();
 }
